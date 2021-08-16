@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="theme-dark">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Chat Archive Replay</title>
+	<!-- <link rel="icon" type="image/png" sizes="32x32" href="https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png"> -->
+	<!-- <link rel="icon" type="image/png" sizes="16x16" href="https://static.twitchcdn.net/assets/favicon-16-52e571ffea063af7a7f4.png"> -->
+	<link rel="stylesheet" type="text/css" href="twitch-theming.css" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="chat-playback.css" crossorigin="anonymous">
+</head>
+<body>
+	<div class="header">
+		<h5 id="room-label">Empty Chat</h5>
+	</div>
+	<div class="banner"></div>
+	<div id="chatlog" class="chat">
+		<div class="chat-line status">Welcome to the chat room!</div>
+		<div class="chat-line message">
+			<div class="username" style="color: #00FF00;">
+				<span class="badges">
+					<img alt="4-Month Subscriber" aria-label="4-Month Subscriber badge" class="chat-badge" src="https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1" srcset="https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1 1x, https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/2 2x, https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/3 4x">
+					<img alt="Prime Gaming" aria-label="Prime Gaming badge" class="chat-badge" src="https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/1" srcset="https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/1 1x, https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/2 2x, https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3 4x">
+				</span>
+				<span>Tustin2121</span>
+			</div><span>: </span><span class="body">Hello world</span>
+		</div>
+	</div>
+	<div class="footer">
+		<div id="alertBar" class="alert open">
+			<div class="ajaxSpinner"><div></div></div>
+			<div class="message">Connecting to chat...</div>
+		</div>
+		<div class="input-box">
+			<div>
+				<span id="ctrl-timecode"><span>0:00:00</span> / <span>0:00:00</span></span>
+				<progress class="timebar" value="50" max="100"></progress>
+			</div>
+		</div>
+		<div class="ctrls">
+			<div class="side left">
+				<button id="ctrl-load">Load</button>
+			</div>
+			<div class="center">
+				<button id="ctrl-back"><span></span></button>
+				<button id="ctrl-play" class="accented"></button>
+				<button id="ctrl-fwd"><span></span></button>
+			</div>
+			<div class="side right">
+				<button id="ctrl-speed" class="speedDisplay">1x</button>
+				<button id="ctrl-settings">
+					<svg width="2rem" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px"><g><path d="M10 8a2 2 0 100 4 2 2 0 000-4z"></path><path fill-rule="evenodd" d="M9 2h2a2.01 2.01 0 001.235 1.855l.53.22a2.01 2.01 0 002.185-.439l1.414 1.414a2.01 2.01 0 00-.439 2.185l.22.53A2.01 2.01 0 0018 9v2a2.01 2.01 0 00-1.855 1.235l-.22.53a2.01 2.01 0 00.44 2.185l-1.415 1.414a2.01 2.01 0 00-2.184-.439l-.531.22A2.01 2.01 0 0011 18H9a2.01 2.01 0 00-1.235-1.854l-.53-.22a2.009 2.009 0 00-2.185.438L3.636 14.95a2.009 2.009 0 00.438-2.184l-.22-.531A2.01 2.01 0 002 11V9c.809 0 1.545-.487 1.854-1.235l.22-.53a2.009 2.009 0 00-.438-2.185L5.05 3.636a2.01 2.01 0 002.185.438l.53-.22A2.01 2.01 0 009 2zm-4 8l1.464 3.536L10 15l3.535-1.464L15 10l-1.465-3.536L10 5 6.464 6.464 5 10z" clip-rule="evenodd"></path></g></svg>
+				</button>
+			</div>
+		</div>
+	</div>
+	<div id="loadBalloon" class="popupBalloon" style="display: none;">
+		<div class="header">
+			<h5>Load Archive</h5>
+			<button style="width: 4rem;" id="load-close">
+				<svg width="2rem" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px"><g><path d="M8.5 10L4 5.5 5.5 4 10 8.5 14.5 4 16 5.5 11.5 10l4.5 4.5-1.5 1.5-4.5-4.5L5.5 16 4 14.5 8.5 10z"></path></g></svg>
+			</button>
+		</div>
+		<div class="prefs">
+			<div>
+				<label>Archive URL:</label>
+				<button id="load-load" class="accented">Load</button>
+			</div>
+			<div class="text-entry">
+				<input type="text" id="load-urlbox" placeholder="Paste url to archive.json here" />
+			</div>
+		</div>
+	</div>
+	<div id="settingsBalloon" class="popupBalloon" style="display: none;">
+		<div class="header">
+			<h5>Settings</h5>
+			<button style="width: 4rem;" id="settings-close">
+				<svg width="2rem" height="100%" version="1.1" viewBox="0 0 20 20" x="0px" y="0px"><g><path d="M8.5 10L4 5.5 5.5 4 10 8.5 14.5 4 16 5.5 11.5 10l4.5 4.5-1.5 1.5-4.5-4.5L5.5 16 4 14.5 8.5 10z"></path></g></svg>
+			</button>
+		</div>
+		<div class="prefs">
+			<div class="toggle">
+				<label for="settings-darkMode">Dark Mode</label>
+				<div>
+					<input type="checkbox" id="settings-darkMode" checked />
+					<label for="settings-darkMode"></label>
+				</div>
+			</div>
+			<div>
+				<label>Playback Speed</label>
+				<p></p>
+			</div>
+			<div class="notched-range" id="settings-playbackSpeed">
+				<div class="notched-range--rail"></div>
+				
+				<span class="notched-range--mark" style="left: calc(0/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(0/7 * 100%);">0.25</div>
+				
+				<span class="notched-range--mark" style="left: calc(1/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(1/7 * 100%);">0.5</div>
+				
+				<span class="notched-range--mark" style="left: calc(2/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(2/7 * 100%);">0.75</div>
+				
+				<span class="notched-range--mark" style="left: calc(3/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(3/7 * 100%);">1</div>
+				
+				<span class="notched-range--mark" style="left: calc(4/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(4/7 * 100%);">1.25</div>
+				
+				<span class="notched-range--mark" style="left: calc(5/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(5/7 * 100%);">1.5</div>
+				
+				<span class="notched-range--mark" style="left: calc(6/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(6/7 * 100%);">1.75</div>
+				
+				<span class="notched-range--mark" style="left: calc(7/7 * 100%);"></span>
+				<div class="notched-range--label" style="left: calc(7/7 * 100%);">2</div>
+				
+				<div class="notched-range--handle" style="left: calc(3/7 * 100%);"></div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- <script type="module" src="twitch-util.mjs"></script> -->
+	<script type="module" src="chat-playback.mjs"></script>
+</body>
+</html>

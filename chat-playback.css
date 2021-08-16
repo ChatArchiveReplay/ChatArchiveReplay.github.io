@@ -1,0 +1,569 @@
+body, html {
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
+html {
+	font-size: 62.5%;
+}
+body {
+	font-size: var(--font-size-base);
+	background-color: var(--color-background-base);
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+
+button {
+	border-style: none;
+	background: none;
+	
+	display: inline-flex;
+	position: relative;
+	-webkit-box-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	justify-content: center;
+	vertical-align: middle;
+	overflow: hidden;
+	text-decoration: none;
+	white-space: nowrap;
+	user-select: none;
+	font-weight: var(--font-weight-semibold);
+	border-radius: var(--border-radius-medium);
+	font-size: var(--button-text-default);
+	height: var(--button-size-default);
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: var(--button-padding-x);
+	padding-right: var(--button-padding-x);
+	fill: currentColor;
+	cursor: pointer;
+	
+	background-color: var(--color-background-button-text-default);
+	color: var(--color-fill-button-icon);
+}
+button:hover {
+	background-color: var(--color-background-button-text-hover);
+	color: var(--color-fill-button-icon-hover);
+}
+button:disabled {
+	opacity: 0.5;
+	background-color: var(--color-background-button-disabled);
+	color: var(--color-text-button-disabled);
+}
+button.accented {
+	background-color: var(--color-background-button-primary-default);
+	color: var(--color-text-button-primary);
+	width: 6rem;
+}
+button.accented:hover {
+	background-color: var(--color-background-button-primary-hover);
+	color: var(--color-text-button-primary);
+}
+
+input[type=text] {
+	border-radius: 0.4rem !important;
+	padding: 0.5rem 1rem !important;
+	font-size: var(--font-size-6) !important;
+	
+    appearance: none;
+    background-clip: padding-box;
+    line-height: 1.5;
+    transition: border var(--timing-short) ease-in,background-color var(--timing-short) ease-in;
+    border-style: solid;
+    border-width: var(--border-width-input);
+    border-color: var(--color-border-input);
+    color: var(--color-text-input);
+    background-color: var(--color-background-input);
+    display: block;
+    width: 100%;
+    height: var(--input-size-default);
+}
+input[type=text]:hover {
+    outline: none;
+    border-color: var(--color-border-input-hover);
+    background-color: var(--color-background-input);
+}
+input[type=text]:focus, input[type=text]:focus:hover {
+    outline: none;
+    border-color: var(--color-border-input-focus);
+    background-color: var(--color-background-input-focus);
+}
+
+
+.header {
+	width: 100%; height: 5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	background-color: var(--color-background-base);
+	border-bottom: var(--border-width-default) solid var(--color-border-base);
+	padding-left: 1rem; padding-right: 1rem;
+	z-index: var(--z-index-above);
+}
+.header #room-label {
+	color: var(--color-text-alt);
+	font-size: var(--font-size-6);
+	font-weight: var(--font-weight-semibold);
+	text-transform: uppercase;
+}
+.chat {
+	background-color: var(--color-background-base);
+	display: flex;
+	flex-direction: column;
+	-webkit-box-flex: 1;
+	flex-grow: 1;
+	overflow-y: scroll;
+	line-height: 2rem;
+	padding-bottom: 1rem;
+}
+
+.chat-line {
+	overflow-wrap: anywhere;
+	padding: 0.5rem 2rem;
+}
+.chat-line.status {
+	color: rgb(83, 83, 95);
+}
+.theme-dark .chat-line.status {
+	color: rgb(173, 173, 184);
+}
+.chat-line > .chat-line {
+	padding-left: 0;
+}
+
+.chat-line.message .badges {
+	display: inline;
+}
+.chat-line.message .badges > img {
+	margin: 0 0 0.15rem 0.3rem;
+	vertical-align: top;
+}
+.chat-line.message .username {
+	display: inline-block;
+	word-break: break-all;
+	font-weight: 700;
+	border-radius: var(--border-radius-medium);
+}
+.chat-line.message .body {
+	display: inline;
+}
+.chat-line.message.highlight .body {
+	color: #fff;
+	border: 4px solid #755ebc;
+	background: #755ebc;
+}
+
+.chat-line.user-notice {
+	word-wrap: break-word;
+	padding-left: 1.6rem;
+	border-left: 4px solid var(--color-border-quote);
+}
+.chat-line.user-notice.sub {
+	border-left-color: #006c85;
+}
+.chat-line.error {
+	color: red;
+}
+
+.chat-emote {
+	display: inline-block;
+	text-align: center;
+	position: relative;
+	vertical-align: middle;
+	margin: -.5rem 0;
+	height: 2.8rem;
+	width: 2.8rem;
+}
+
+
+.footer {
+	display: block;
+	padding-bottom: 1rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	z-index: 2;
+}
+
+.footer .alert {
+	display: flex;
+	-webkit-box-pack: justify;
+	justify-content: space-between;
+	padding-bottom: 0.5rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	
+	background-color: var(--color-background-alt);
+	border-top: var(--border-width-default) solid var(--color-border-base);
+	border-right: var(--border-width-default) solid var(--color-border-base);
+	border-bottom: var(--border-width-default) solid var(--color-border-base);
+	border-left: var(--border-width-default) solid var(--color-border-base);
+	border-radius: 0.6rem;
+	position: relative;
+	right: 0px;
+	left: 0px;
+	z-index: var(--z-index-below);
+	
+	min-width: 100%;
+	margin: 0px 0px -3.5rem;
+	bottom: 0rem;
+	transition-property: bottom;
+	transition-timing-function: ease;
+	transition-duration: 0.5s;
+}
+.footer .alert.open {
+	bottom: 3rem;
+}
+.footer .alert.progress {
+	background: linear-gradient(to right, var(--color-background-accent-alt) var(--progress), var(--color-background-alt) var(--progress));
+}
+.footer .alert .message {
+	display: flex;
+	-webkit-box-flex: 1;
+	flex-grow: 1;
+	-webkit-box-align: center;
+	align-items: center;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+	color: var(--color-text-alt-2);
+	font-weight: var(--font-weight-semibold);
+}
+
+.footer .input-box {
+	background-color: var(--color-background-alt);
+	border-bottom-left-radius: 0.6rem;
+	border-bottom-right-radius: 0.6rem;
+	display: block;
+	padding: 0rem;
+	
+	min-width: 100%;
+	border-top: 0px;
+	box-shadow: none;
+	margin: 0px;
+	border-radius: 0.6rem;
+}
+.footer .input-box > div {
+	font-family: inherit;
+	appearance: none;
+	background-clip: padding-box;
+	line-height: 1.5;
+	min-height: 4rem;
+	transition: border var(--timing-short) ease-in,background-color var(--timing-short) ease-in;
+	border-style: solid;
+	border-width: var(--border-width-input);
+	border-color: var(--color-border-input);
+	color: var(--color-text-input);
+	background-color: var(--color-background-input);
+	display: block;
+	width: 100%;
+	padding: var(--space-05) var(--space-1);
+	resize: none;
+	border-radius: 0.6rem;
+	text-align: center;
+}
+
+.footer .timebar {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: 2rem;
+	-webkit-appearance: none;
+}
+.footer .timebar::-webkit-progress-inner-element {
+	position: absolute;
+	border-radius: 10rem;
+	overflow: hidden;
+	height: 0.4rem;
+	top: 0.8rem;
+}
+.footer .timebar::-webkit-progress-value {
+	background-color: var(--color-background-accent-alt);
+}
+.footer .timebar::-webkit-progress-bar {
+	background-color: var(--color-background-alt-2);
+}
+
+.footer .ctrls {
+	display: flex;
+	flex-direction: row;
+	-webkit-box-pack: justify;
+	justify-content: space-between;
+	margin-top: 1rem;
+}
+.footer .ctrls .side {
+	display: flex;
+	flex-basis: 9rem;
+}
+.footer .ctrls .side.right {
+	justify-content: flex-end;
+}
+.footer .ctrls .side.left {
+	justify-content: flex-start;
+}
+
+/* Logos */
+#ctrl-play::before {
+	content: "";
+	display: inline-block;
+	border: transparent solid 0.7rem;
+	border-left: currentColor solid 1.5rem;
+	border-right: 0;
+	width: 0; height: 0;
+	transition-property: border-left, border-right, width, height;
+	transition-duration: 0.5s;
+	transition-timing-function: ease;
+}
+.playing #ctrl-play::before {
+	width: 0.5rem; height: 1.4rem;
+	border-left: currentColor solid 0.4rem;
+	border-right: currentColor solid 0.4rem;
+	border-top: 0;
+	border-bottom: 0;
+}
+
+#ctrl-fwd > span, #ctrl-back > span {
+	border: 0.2rem solid currentColor;
+	border-radius: var(--border-radius-rounded);
+	position: relative;
+	padding: 0.2rem;
+	font-size: 1rem;
+}
+#ctrl-fwd > span::before, #ctrl-back > span::before {
+	content: "10";
+	position: relative;
+	z-index: 1;
+}
+#ctrl-fwd > span::after, #ctrl-back > span::after {
+    position: absolute;
+    border-bottom: solid 1px var(--color-background-base);
+    background-color: var(--color-background-base);
+	font-size: 0.8rem;
+    letter-spacing: -3px;
+}
+/* 
+#ctrl-fwd:hover > span::after, #ctrl-back:hover > span::after {
+	border-bottom: solid 1px var(--color-background-button-text-hover);
+    background-color: var(--color-background-button-text-hover);
+} */
+#ctrl-fwd > span::after {
+	content: "\25B6\25B6";
+	top: -40%; left: 50%;
+} 
+#ctrl-back > span::after {
+	content: "\25C0\25C0";
+	top: -40%; right: 50%;
+}
+
+
+.popupBalloon {
+	position: fixed;
+	z-index: var(--z-index-balloon);
+	/* inset: auto 0px 100% auto; */
+	
+	min-width: 0px;
+	max-width: 90vw;
+	border-radius: 0.6rem;
+	background-color: var(--color-background-base);
+	box-shadow: var(--shadow-elevation-2);
+	white-space: normal;
+}
+#settingsBalloon {
+	bottom: 4rem;
+	right: 0.4rem;
+	width: 32rem;
+}
+#loadBalloon {
+	bottom: 4rem;
+	left: 0.4rem;
+	width: 42rem;
+}
+.popupBalloon .header h5 {
+	-webkit-box-align: center;
+	align-items: center;
+	display: flex;
+	text-align: center;
+	-webkit-box-flex: 1;
+	flex-grow: 1;
+	-webkit-box-pack: center;
+	justify-content: center;
+}
+.popupBalloon .header button {
+	display: inline-flex;
+	-webkit-box-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	justify-content: center;
+	user-select: none;
+	height: var(--button-size-default);
+	width: var(--button-size-default);
+	border-radius: var(--border-radius-medium);
+	background-color: var(--color-background-button-text-default);
+	color: var(--color-fill-button-icon);
+}
+.popupBalloon .prefs {
+	color: var(--color-text-base);
+	background-color: var(--color-background-base);
+	padding: 1rem;
+	border-bottom-left-radius: 0.4rem;
+	border-bottom-right-radius: 0.4rem;
+}
+.popupBalloon .prefs > div {
+	padding: 0.5rem;
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+}
+.popupBalloon .prefs > div > label {
+	-webkit-box-flex: 1;
+	flex-grow: 1;
+	margin-right: 2rem;
+}
+
+.popupBalloon .prefs .toggle > div > input {
+	position: absolute;
+	opacity: 0;
+}
+.popupBalloon .prefs .toggle > div > label {
+	display: inline-block;
+	position: relative;
+	order: 0;
+	width: 3.5rem;
+	height: 2rem;
+	content: "";
+	cursor: pointer;
+	vertical-align: bottom;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 1rem;
+	transition-property: background-color;
+	transition-timing-function: ease;
+	transition-duration: var(--timing-short);
+	border-color: var(--color-border-toggle);
+	background-color: var(--color-background-toggle);
+}
+.popupBalloon .prefs .toggle > div > label::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0.2rem;
+	bottom: 0.2rem;
+	left: 0.2rem;
+	width: 1.2rem;
+	height: 1.2rem;
+	transition-property: left;
+	transition-timing-function: ease;
+	transition-duration: var(--timing-short);
+	border-radius: var(--border-radius-rounded);
+	background-color: var(--color-background-toggle-handle);
+}
+.popupBalloon .prefs .toggle > div > input:checked + label::after {
+	content: "";
+	left: calc((100% - 1.2rem) - 0.2rem);
+	background-color: var(--color-background-toggle-checked);
+}
+.popupBalloon .prefs .toggle > div > input:checked + label {
+	border-color: var(--color-border-toggle-checked);
+}
+.popupBalloon .prefs .toggle > div > input:checked + label::before {
+	border-width: 0px 0px 2px 2px;
+	border-style: solid;
+	border-color: var(--color-text-toggle-checked-icon);
+	display: block;
+	position: absolute;
+	top: 0.7rem;
+	left: 0.8rem;
+	width: 0.7rem;
+	height: 0.3rem;
+	transform: translate3d(-50%, -50%, 0px) rotate(-45deg);
+	content: "";
+}
+
+.popupBalloon .prefs .text-entry > input[type=text] {
+	display: block;
+}
+
+.popupBalloon .prefs .notched-range {
+	position: relative;
+	height: 1.6rem;
+	width: calc(100% - 2rem);
+	cursor: pointer;
+	padding: 5px 0px;
+	margin: 0 1rem 20px;
+}
+.popupBalloon .prefs .notched-range--rail, 
+.popupBalloon .prefs .notched-range--track {
+	position: absolute;
+	height: 0.2rem;
+}
+.popupBalloon .prefs .notched-range--rail {
+	width: 100%;
+	background-color: var(--color-background-range);
+}
+.popupBalloon .prefs .notched-range--mark {
+	position: absolute;
+	background-color: var(--color-fill-range-notch);
+	transform: translateX(-50%);
+	border-radius: var(--border-radius-rounded);
+	width: 10px; height: 10px;
+	margin-top: -4px;
+}
+.popupBalloon .prefs .notched-range--label {
+	color: var(--color-text-base);
+	position: absolute;
+	top: calc(1.6rem + 50%);
+	transform: translateX(-50%) translateY(-50%);
+	white-space: nowrap;
+}
+.popupBalloon .prefs .notched-range--handle {
+	position: absolute;
+	width: 1.6rem;
+	height: 1.6rem;
+	margin-top: -0.7rem;
+	background-color: var(--color-background-base);
+	border: 5px solid var(--color-border-brand);
+	transform: translateX(-50%);
+	border-radius: var(--border-radius-rounded);
+}
+.popupBalloon .prefs .notched-range--handle:hover {
+	box-shadow: 0 0 5px var(--color-background-range-fill);
+}
+
+
+.ajaxSpinner {
+	margin: 0.5rem;
+	opacity: 0;
+	animation-name: fadeInOut;
+	animation-iteration-count: 1;
+	animation-timing-function: ease;
+	animation-fill-mode: forwards;
+	animation-duration: var(--timing-medium);
+	animation-delay: 300ms;
+}
+@keyframes fadeInOut {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+.ajaxSpinner > div {
+	position: relative;
+	transform: translateZ(0px);
+	animation-name: ajaxSpin;
+	animation-iteration-count: infinite;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+	width: 1.6rem;
+	height: 1.6rem;
+	border-radius: 50%;
+	border: var(--color-border-spinner) solid 2px;
+	border-bottom: var(--color-border-spinner-fill) solid 2px;
+	/*width:2.2rem;
+	height:2.2rem;
+	border-radius:50%;
+	border:", " solid ", ";border-left:", " solid ", ";position:relative;transform:translateZ(0);animation-name:", ";animation-iteration-count:infinite;animation-duration:1s;animation-timing-function:linear;", " ", ""], 
+	(0, u.V)("border-width-spinner"), (0, d.g)("color-border-spinner"), (0, u.V)("border-width-spinner"), (0, d.g)("color-border-spinner-fill"), I, (0, h.E)("size", ((r = {})[i.Small] = {*/
+}
+@keyframes ajaxSpin {
+	0% { transform: rotate( 0deg ); }
+	100% { transform: rotate( 360deg ); }
+}

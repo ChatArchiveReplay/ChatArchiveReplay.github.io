@@ -1,0 +1,15 @@
+- Chat Replay
+[X] Make a chat that looks like Twitch Chat
+[X] Play back from archive json
+[ ] Make Load dialog box work
+[ ] Seek by clicking on progress bar
+[ ] Put streamer's name in top bar instead of "Empty Chat"
+[ ] Load from Twitch API the chat badges for non-chached badges
+[ ] Load from Twitch API emotes for non-stored emotes.
+
+- Archive Tool
+[X] Concatenate > Implement two archives concatenated together
+[ ] Download > Implement archiving from Twitch API 
+[ ] Squish > Implement: Allow chat to be time compressed between two time stamps
+[ ] Download > Switch to embed emotes into the archive
+[ ] Download > Switch to embed badges into the archive
