@@ -11,23 +11,24 @@
 </head>
 <body>
 	<div class="header">
-		<h5 id="room-label">Empty Chat</h5>
+		<h5 id="room-label">Loading Chat</h5>
 	</div>
 	<div class="banner"></div>
 	<div id="chatlog" class="chat">
-		<div class="chat-line status">Welcome to the chat room!</div>
-		<div class="chat-line message">
+		<div class="chat-line status">Loading...</div>
+		<!-- <div class="chat-line status">Welcome to the chat room!</div> -->
+		<!-- <div class="chat-line message">
 			<div class="username" style="color: #00FF00;">
 				<span class="badges">
-					<img alt="4-Month Subscriber" aria-label="4-Month Subscriber badge" class="chat-badge" src="https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1" srcset="https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1 1x, https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/2 2x, https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/3 4x">
-					<img alt="Prime Gaming" aria-label="Prime Gaming badge" class="chat-badge" src="https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/1" srcset="https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/1 1x, https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/2 2x, https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3 4x">
+					<img class="chat-badge" src="badges/moderator.png" />
+					<img class="chat-badge" src="badges/prime.png" />
 				</span>
 				<span>Tustin2121</span>
-			</div><span>: </span><span class="body">Hello world</span>
-		</div>
+			</div><span>: </span><span class="body">Hello world!</span>
+		</div> -->
 	</div>
 	<div class="footer">
-		<div id="alertBar" class="alert open">
+		<div id="alertBar" class="alert">
 			<div class="ajaxSpinner"><div></div></div>
 			<div class="message">Connecting to chat...</div>
 		</div>
@@ -42,9 +43,9 @@
 				<button id="ctrl-load">Load</button>
 			</div>
 			<div class="center">
-				<button id="ctrl-back"><span></span></button>
-				<button id="ctrl-play" class="accented"></button>
-				<button id="ctrl-fwd"><span></span></button>
+				<button id="ctrl-back" class="disable-on-finish"><span></span></button>
+				<button id="ctrl-play" class="disable-on-finish accented"></button>
+				<button id="ctrl-fwd" class="disable-on-finish"><span></span></button>
 			</div>
 			<div class="side right">
 				<button id="ctrl-speed" class="speedDisplay">1x</button>
@@ -79,6 +80,20 @@
 			</button>
 		</div>
 		<div class="prefs">
+			<div class="toggle">
+				<label for="settings-focusPause">Pause on Focus Lost</label>
+				<div>
+					<input type="checkbox" id="settings-focusPause" />
+					<label for="settings-focusPause"></label>
+				</div>
+			</div>
+			<div class="toggle" title="If the browser is slowing the update interval of this page, playback will pause until normal intervals resume.">
+				<label for="settings-bgPause">Pause on Background Throttle</label>
+				<div>
+					<input type="checkbox" id="settings-bgPause" />
+					<label for="settings-bgPause"></label>
+				</div>
+			</div>
 			<div class="toggle">
 				<label for="settings-darkMode">Dark Mode</label>
 				<div>

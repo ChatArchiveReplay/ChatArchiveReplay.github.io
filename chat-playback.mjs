@@ -5,14 +5,22 @@ import { requestJson } from "./twitch-util.mjs";
 let chatLog;
 /** @type {number} */
 let lastTick = 0, currTime = 0, speed = 0, currIndex = 0;
-let currSettings = { dark:true, speed:1, lastSpeed:1.5, lastUrl:null, lastTimecode:0 };
+/** */
+let isFocusedPaused = false, isBgPaused = false;
+/** */
+let currSettings = { 
+	dark: true, 
+	speed: 1, lastSpeed: 1.5, 
+	lastUrl: null, lastTimecode: 0,
+	focusPause: false, bgPause: false,
+};
 
 /** @type {Map<string, string>} */
 const emoteDB = new Map();
 const badgeDB = new Map([
 	['moderator', 'badges/moderator.png'],
 	['subscriber', 'badges/subscriber.png'],
-	['prime', 'badges/prime.png'],
+	['premium', 'badges/prime.png'],
 	['gift', 'badges/gifts25.png'],
 	['bits', 'badges/bits1.png'],
 	['partner', 'badges/partner.png'], //verified
@@ -30,37 +38,68 @@ const SEEK_MESSAGES = 30;
 const REGEX_SUB = /^(.+) (subscribed .+\.) /i;
 const REGEX_RESUB = /^(.+) (subscribed .+\. They've subscribed for .+!) /i;
 
+const SVG_SUBSTAR = `<svg type="color-fill-current" width="20px" height="20px" version="1.1" viewBox="0 0 20 20" x="0px" y="0px"><g><path d="M8.944 2.654c.406-.872 1.706-.872 2.112 0l1.754 3.77 4.2.583c.932.13 1.318 1.209.664 1.853l-3.128 3.083.755 4.272c.163.92-.876 1.603-1.722 1.132L10 15.354l-3.579 1.993c-.846.47-1.885-.212-1.722-1.132l.755-4.272L2.326 8.86c-.654-.644-.268-1.723.664-1.853l4.2-.583 1.754-3.77z"></path></g></svg>`;
+
 /** @type {import("./global").User} */
-const PLAYBACK_ANNOUNCER = {
+const USER_CREATOR = {
 	_id: '0', type: 'user',
-	display_name:'Playback',  name:'playback',
+	display_name:'Tustin2121',  name:'tustin2121',
 	bio: null, created_at: null, updated_at: null, logo: null,
 };
 
-/** @type {import("./global").Comment} */
-const PLAYBACK_FINISHED_MESSAGE = {
-	_id: "0",
-	created_at: null, updated_at: null,
-	channel_id: "0", content_type: 'video', content_id: '0',
-	content_offset_seconds: 0,
-	commenter: PLAYBACK_ANNOUNCER,
-	source: 'chat',
-	state: 'published',
-	message: {
-		body: 'Playback has ended',
-		bits_spent: 0,
-		fragments: null,
-		is_action: false,
-		user_badges: null,
-		user_color: null,
-		user_notice_params: { "msg-id": 'system-announce' },
-		emoticons: [],
-	},
-	more_replies: false,
-}
+const PLAYBACK_FINISHED_MESSAGE = makeStaticMessage(0, "Playback has ended.", { noticeType:'system-announce' });
+const PLAYBACK_LOADED_MESSAGE = makeStaticMessage(0, "Chat archive loaded successfully. Playback beginning.", { noticeType:'system-announce' });
+const FOCUS_PAUSE_MESSAGE = makeStaticMessage(0, "Playback was paused due to focus lost.", { noticeType:'system-announce' });
+const BG_PAUSE_MESSAGE = makeStaticMessage(0, "Playback was paused due to background throttle.", { noticeType:'system-announce' });
+
+/** @type {import("./global").ChatArchive} */
+const DEFAULT_ARCHIVE = {
+	streamer: { name: "Chat Archive Playback", id: 0 },
+	video: { start:0, end:10.3 },
+	comments: [
+		makeStaticMessage(0.5, "Welcome to the Chat Archive Playback tool!", { noticeType:'system-announce' }),
+		makeStaticMessage(1.5, "If you have an archive you want to load, paste it into the box at the bottom of the page here."),
+		makeStaticMessage(6.3, "This is designed as a lightweight alternative to the chat rendering feature of <a href='https://github.com/lay295/TwitchDownloader'>lay295's TwitchDownloader</a>. You can use said downloader to download Twitch chat archives to use with this."),
+		makeStaticMessage(9.8, "Use this program alongside Twitch VODs uploaded to YouTube! Even play back at up to 2x speed!"),
+	]
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Functions
+
+/**
+ * 
+ * @param {string} msg
+ * @returns {import("./global").Comment}
+ */
+ function makeStaticMessage(ts, msg, { noticeType=null }={}) {
+	return {
+		_id: "0",
+		created_at: null, updated_at: null,
+		channel_id: "0", content_type: 'video', content_id: '0',
+		content_offset_seconds: ts,
+		commenter: USER_CREATOR,
+		source: 'chat',
+		state: 'published',
+		message: {
+			body: msg,
+			bits_spent: 0,
+			fragments: [
+				{ text: msg, emoticon: null },
+			],
+			is_action: false,
+			user_badges: [
+				{ _id: "moderator", version: "1" },
+				{ _id: "premium", version: "1" },
+			],
+			user_color: null,
+			user_notice_params: { "msg-id": noticeType },
+			emoticons: [],
+		},
+		more_replies: false,
+	}
+}
+
 /**
  * 
  * @param {string} username 
@@ -183,18 +222,23 @@ function postMessage(comment) {
 			// So, stupidly, the announcement is archived in the same body as the chat message, so we gotta manually extract it
 			let bodyHtml = compileBodyHtml();
 			let match = ((commentType === 'sub')?REGEX_SUB:REGEX_RESUB).exec(bodyHtml);
-			let announce = match[0];
-			bodyHtml = bodyHtml.slice(announce.length).trim();
-			let $b = Object.assign(document.createElement('div'), { className:'chat-line user-notice sub' });
-			$b.append(
-				Object.assign(document.createElement('div'), { className:'notice-announce', innerHTML:announce }),
+			let name = match[1];
+			let announce = match[2].slice(0, 1).toUpperCase() + match[2].slice(1);
+			bodyHtml = bodyHtml.slice(match[0].length).trim();
+			
+			let $outer = Object.assign(document.createElement('div'), { className:'chat-line user-notice sub' });
+			let $announce = Object.assign(document.createElement('div'), { className:'notice-announce' });
+			$announce.append(
+				Object.assign(document.createElement('div'), { innerHTML:SVG_SUBSTAR }),
+				Object.assign(document.createElement('div'), { innerHTML:`<span class="username">${name}</span><span class="announce">${announce}</span>` }),
 			);
+			$outer.append($announce);
 			if (bodyHtml) {
 				let $a = createNormalChatLine(bodyHtml);
 				// $a.classList.remove('chat-line');
-				$b.append($a);
+				$outer.append($a);
 			}
-			$doc.append($b);
+			$doc.append($outer);
 		}
 		else
 		{	// Normal message
@@ -293,30 +337,7 @@ function postMessage(comment) {
  * 
  * @param {string} url 
  */
-function loadChatArchive(url, { seekTo=null }={}) {
-	// const $bar = showAlertBar('Loading chat archive...');
-	// $bar.classList.add('progress');
-	// let promise = new Promise((resolve, reject)=>{
-	// 	let req = new XMLHttpRequest();
-	// 	req.addEventListener('load', (ev)=>{
-	// 		if (typeof req.response !== 'object') {
-	// 			return reject(new Error("Response is not a json object!"));
-	// 		}
-	// 		return resolve(req.response);
-	// 	});
-	// 	req.addEventListener('error', (ev)=>{
-	// 		return reject(new Error("Resource returned "+req.status));
-	// 	});
-	// 	req.addEventListener('abort', (ev)=>{
-	// 		return reject(new Error("Request aborted"));
-	// 	});
-	// 	req.addEventListener('progress', (ev)=>{
-	// 		$bar.style.setProperty('--progress', `${(ev.loaded/ev.total)*100}%`);
-	// 	});
-	// 	req.open('GET', url, true);
-	// 	req.responseType = 'json';
-	// 	req.send();
-	// })
+function downloadChatArchive(url, { seekTo=null }={}) {
 	currSettings.lastUrl = url;
 	
 	return requestJson(url, showAlertBar("Loading chat archive...", true))
@@ -329,31 +350,52 @@ function loadChatArchive(url, { seekTo=null }={}) {
 			throw new Error("Response is not a properly formatted object!");
 		}
 		
-		if (typeof json['emotes'] !== 'object') {
-			// TODO load full emotes list from Twitch
-			
-		}
-		{ // Set total time
-			let t = json.video.end;
-			let h = Math.floor(t / (60 * 60));
-			let m = Math.floor(t / 60) % 60;
-			let s = Math.floor(t) % 60;
-			let $time = document.querySelector('#ctrl-timecode > span:nth-child(2)');
-			$time.innerText = `${h}:${('00'+m).slice(-2)}:${('00'+s).slice(-2)}`;
-		}
-		
-		chatLog = json;
-		if (typeof seekTo === 'number') {
-			seekToTimecode(seekTo);
-		} else {
-			seekToTimecode(json.video.start);
-		}
+		_loadChatArchive(json, { seekTo });
 	});
 }
 
+/**
+ * 
+ * @param {import("./global").ChatArchive} json 
+ * @param {number} seekTo
+ */
+function _loadChatArchive(json, { seekTo=null }={}) {
+	if (typeof json['emotes'] !== 'object') {
+		// TODO load full emotes list from Twitch
+		
+	}
+	{ // Set total time
+		let t = json.video.end;
+		let h = Math.floor(t / (60 * 60));
+		let m = Math.floor(t / 60) % 60;
+		let s = Math.floor(t) % 60;
+		let $time = document.querySelector('#ctrl-timecode > span:nth-child(2)');
+		$time.innerText = `${h}:${('00'+m).slice(-2)}:${('00'+s).slice(-2)}`;
+	}
+	document.getElementById('room-label').innerText = `${json.streamer.name} Chat Archive`;
+	document.querySelectorAll('.disable-on-finish').forEach((x)=>{x.disabled = false});
+	
+	chatLog = json;
+	if (typeof seekTo === 'number') {
+		seekToTimecode(seekTo);
+	} else {
+		seekToTimecode(json.video.start);
+	}
+}
 
-function togglePlayback() {
-	if (speed === 0) {
+function _finishPlayback() {
+	postMessage(PLAYBACK_FINISHED_MESSAGE);
+	speed = 0;
+	currSettings.lastUrl = 0;
+	currSettings.lastTimecode = 0;
+	saveSettings();
+	document.documentElement.classList.remove('playing');
+	document.querySelectorAll('.disable-on-finish').forEach((x)=>{x.disabled = true});
+}
+
+function togglePlayback(forceTo) {
+	let start = (typeof forceTo === 'boolean')? forceTo : speed === 0;
+	if (start) {
 		lastTick = Date.now();
 		speed = currSettings.speed;
 		document.documentElement.classList.add('playing');
@@ -403,10 +445,22 @@ function seekToTimecode(timeCode) {
 }
 function runUpdate() {
 	let currTick = Date.now();
-	let delta = ((currTick - lastTick) / 1000) * speed;
-	currTime += delta;
+	let delta = currTick - lastTick;// * speed;
 	lastTick = currTick;
+	
+	if (delta > 510) { console.log(`Last tick was ${delta}ms long.`); }
+	if (lastTick === delta) return; // Skip first interval
 	if (!chatLog) return;
+	if (isFocusedPaused) return;
+	if (currSettings.bgPause && delta > 800 && speed !== 0) {
+		if (!isBgPaused) {
+			isBgPaused = true;
+			postMessage(BG_PAUSE_MESSAGE);
+		}
+		return;
+	}
+	currTime += (delta / 1000) * speed;
+	isBgPaused = false;
 	
 	const log = chatLog.comments;
 	while (currIndex < log.length && log[currIndex].content_offset_seconds < currTime)
@@ -414,11 +468,16 @@ function runUpdate() {
 		postMessage(log[currIndex]);
 		currIndex++;
 	}
-	if (currIndex >= log.length) {
+	if (currIndex === log.length) {
 		// Finish playback
-		postMessage()
+		_finishPlayback();
+		currIndex++;
 	}
 	updateTimeDisplay();
+	if (currIndex % 5 === 0) {
+		currSettings.lastTimecode = currTime;
+		saveSettings();
+	}
 }
 setInterval(runUpdate, 500);
 
@@ -446,6 +505,21 @@ document.getElementById('ctrl-back').addEventListener('click', ()=>{
 	// The update doesn't handle backwards movement, so manual seek needed
 	seekToTimecode(currTime - 10);
 });
+document.getElementById('load-load').addEventListener('click', ()=>{
+	let val = document.getElementById('load-urlbox').value;
+	try {
+		let url = new URL(val);
+		//TODO validate the URL??
+		downloadChatArchive(url.toString()).then(()=>{
+			currSettings.lastTimecode = 0;
+			togglePlayback(true);
+			setTimeout(()=>postMessage(PLAYBACK_LOADED_MESSAGE), 1000);
+		});
+	} catch (err) {
+		//TODO show error to user
+		console.error('Cannot load archive: URL is invalid.', err);
+	}
+});
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -472,7 +546,12 @@ function loadSettings() {
 	setDarkTheme(currSettings.dark);
 	setPlaybackSpeed(currSettings.speed);
 	if (currSettings.lastUrl) {
-		loadChatArchive(currSettings.lastUrl, { seekTo:currSettings.lastTimecode });
+		downloadChatArchive(currSettings.lastUrl, { seekTo:currSettings.lastTimecode });
+	} else {
+		toggleLoadPane();
+		_loadChatArchive(DEFAULT_ARCHIVE);
+		document.getElementById('room-label').innerText = DEFAULT_ARCHIVE.streamer.name;
+		togglePlayback(true);
 	}
 }
 function saveSettings() {
@@ -488,6 +567,26 @@ function toggleOptionsPane() {
 		$el.style.display = 'none';
 	}
 }
+
+function setFocusPause(bool) {
+	currSettings.focusPause = bool;
+	saveSettings();
+}
+document.getElementById('settings-focusPause').addEventListener('change', (e)=>{
+	/** @type {HTMLInputElement} */
+	let $el = e.currentTarget;
+	setFocusPause($el.checked);
+});
+
+function setBgPause(bool) {
+	currSettings.bgPause = bool;
+	saveSettings();
+}
+document.getElementById('settings-bgPause').addEventListener('change', (e)=>{
+	/** @type {HTMLInputElement} */
+	let $el = e.currentTarget;
+	setBgPause($el.checked);
+});
 
 function setDarkTheme(useDark) {
 	if (useDark) {
@@ -539,14 +638,37 @@ document.getElementById('settings-playbackSpeed').addEventListener('click', (e)=
 
 ///////////////////////////////////////////////////////////////////////////////
 
-window.addEventListener('beforeunload', ()=>{
-	currSettings.lastTimecode = currTime;
-	saveSettings();
+window.resetPage = function resetPage() {
+	currSettings = {};
+	localStorage.clear();
+	window.location.reload();
+}
+
+window.addEventListener('visibilitychange', ()=>{
+	if (document.visibilityState === 'hidden') {
+		currSettings.lastTimecode = currTime;
+		saveSettings();
+	}
+});
+
+window.addEventListener('blur', ()=>{
+	if (!currSettings.focusPause) return;
+	if (speed !== 0) {
+		isFocusedPaused = true;
+		postMessage(FOCUS_PAUSE_MESSAGE);
+	}
+});
+window.addEventListener('focus', ()=>{
+	if (!currSettings.focusPause) return;
+	if (isFocusedPaused) {
+		isFocusedPaused = false;
+	}
 });
 
 ///////////////////////////////////////////////////////////////////////////////
 
 loadSettings();
+window.currSettings = currSettings;
 
-// loadChatArchive("ref/20210807_Mattophobia_Subnautica5.json");
+// downloadChatArchive("ref/20210807_Mattophobia_Subnautica5.json");
 // currTime = 35;

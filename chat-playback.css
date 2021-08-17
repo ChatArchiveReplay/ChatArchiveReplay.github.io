@@ -49,8 +49,8 @@ button:hover {
 }
 button:disabled {
 	opacity: 0.5;
-	background-color: var(--color-background-button-disabled);
-	color: var(--color-text-button-disabled);
+	background-color: var(--color-background-button-disabled) !important;
+	color: var(--color-text-button-disabled) !important;
 }
 button.accented {
 	background-color: var(--color-background-button-primary-default);
@@ -163,6 +163,18 @@ input[type=text]:focus, input[type=text]:focus:hover {
 }
 .chat-line.user-notice.sub {
 	border-left-color: #006c85;
+}
+.chat-line .notice-announce {
+	fill: currentColor;
+    display: flex;
+    flex-direction: row;
+}
+.chat-line .notice-announce > div {
+	padding: 0.2rem;
+}
+.chat-line .notice-announce .username {
+	font-weight: 700;
+	display: block;
 }
 .chat-line.error {
 	color: red;
@@ -486,6 +498,7 @@ input[type=text]:focus, input[type=text]:focus:hover {
 
 .popupBalloon .prefs .notched-range {
 	position: relative;
+	display: block;
 	height: 1.6rem;
 	width: calc(100% - 2rem);
 	cursor: pointer;
