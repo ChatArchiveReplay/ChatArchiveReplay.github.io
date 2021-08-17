@@ -6,13 +6,13 @@ let chatLog;
 /** @type {number} */
 let lastTick = 0, currTime = 0, speed = 0, currIndex = 0;
 /** */
-let isFocusedPaused = false, isBgPaused = false;
+let isFocusedPaused = false, isBgPaused = false, isSleepPaused = false;
 /** */
 let currSettings = { 
 	dark: true, 
 	speed: 1, lastSpeed: 1.5, 
 	lastUrl: null, lastTimecode: 0,
-	focusPause: false, bgPause: false,
+	focusPause: false, bgPause: false, sleepPause: true,
 };
 
 /** @type {Map<string, string>} */
@@ -51,6 +51,7 @@ const PLAYBACK_FINISHED_MESSAGE = makeStaticMessage(0, "Playback has ended.", { 
 const PLAYBACK_LOADED_MESSAGE = makeStaticMessage(0, "Chat archive loaded successfully. Playback beginning.", { noticeType:'system-announce' });
 const FOCUS_PAUSE_MESSAGE = makeStaticMessage(0, "Playback was paused due to focus lost.", { noticeType:'system-announce' });
 const BG_PAUSE_MESSAGE = makeStaticMessage(0, "Playback was paused due to background throttle.", { noticeType:'system-announce' });
+const SLEEP_PAUSE_MESSAGE = makeStaticMessage(0, "Playback was paused due to program sleep.", { noticeType:'system-announce' });
 
 /** @type {import("./global").ChatArchive} */
 const DEFAULT_ARCHIVE = {
@@ -459,8 +460,15 @@ function runUpdate() {
 		}
 		return;
 	}
+	if (currSettings.sleepPause && delta > 61000 && speed !== 0) {
+		if (!isSleepPaused) {
+			isSleepPaused = true;
+			postMessage(SLEEP_PAUSE_MESSAGE);
+		}
+		return;
+	}
 	currTime += (delta / 1000) * speed;
-	isBgPaused = false;
+	isBgPaused = isSleepPaused = false;
 	
 	const log = chatLog.comments;
 	while (currIndex < log.length && log[currIndex].content_offset_seconds < currTime)
@@ -586,6 +594,16 @@ document.getElementById('settings-bgPause').addEventListener('change', (e)=>{
 	/** @type {HTMLInputElement} */
 	let $el = e.currentTarget;
 	setBgPause($el.checked);
+});
+
+function setSleepPause(bool) {
+	currSettings.sleepPause = bool;
+	saveSettings();
+}
+document.getElementById('settings-sleepPause').addEventListener('change', (e)=>{
+	/** @type {HTMLInputElement} */
+	let $el = e.currentTarget;
+	setSleepPause($el.checked);
 });
 
 function setDarkTheme(useDark) {
