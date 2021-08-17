@@ -257,7 +257,7 @@ function postMessage(comment) {
 			$doc.append($a);
 			
 			if (commentType === 'highlighted-message') {
-				$a.classList.add('highlight');
+				$a.classList.add('highlight', 'user-notice');
 			}
 		}
 	} 
@@ -312,9 +312,11 @@ function postMessage(comment) {
 		}
 		else if (comment.message.emoticons) {
 			// Sometimes, randomly and rarely, there's no fragments array, and instead there's "emoticons"
-			bodyHtml = comment.message.body;
+			let bodyRaw = comment.message.body;
+			let i = 0;
 			for (let emotes of comment.message.emoticons) {
-				bodyHtml = bodyHtml.slice(0, emotes.begin) + resolveEmote(emotes._id) + bodyHtml.slice(emotes.end);
+				bodyHtml += bodyRaw.slice(i, emotes.begin-1) + resolveEmote(emotes._id);
+				i = emotes.end;
 			}
 		}
 		else {
