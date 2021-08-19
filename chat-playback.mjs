@@ -348,8 +348,6 @@ function postMessage(comment) {
  * @param {string} url 
  */
 function downloadChatArchive(url, { seekTo=null }={}) {
-	currSettings.lastUrl = url;
-	
 	return requestJson(url, showAlertBar("Loading chat archive...", true))
 	.finally(hideAlertBar)
 	.then((/** @type {import("./global").ChatArchive} */ json)=>{
@@ -507,7 +505,6 @@ document.getElementById('load-close').addEventListener('click', toggleLoadPane);
 
 document.getElementById('ctrl-fwd').addEventListener('click', ()=>{
 	// Set the current time forward and the update will handle posting manually
-	// currTime += 10;
 	seekToTimecode(currTime + 10);
 });
 document.getElementById('ctrl-back').addEventListener('click', ()=>{
@@ -518,8 +515,13 @@ document.getElementById('load-load').addEventListener('click', ()=>{
 	let val = document.getElementById('load-urlbox').value;
 	try {
 		let url = new URL(val);
+		// If this is a dropbox link, and the download is disabled, enable it for our use
+		if (url.hostname === 'www.dropbox.com' && url.search === '?dl=0') {
+			url.search = '?dl=1';
+		}
 		//TODO validate the URL??
 		downloadChatArchive(url.toString()).then(()=>{
+			currSettings.lastUrl = url.toString();
 			currSettings.lastTimecode = 0;
 			togglePlayback(true);
 			setTimeout(()=>postMessage(PLAYBACK_LOADED_MESSAGE), 1000);
