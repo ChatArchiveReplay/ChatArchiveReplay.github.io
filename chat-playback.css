@@ -67,28 +67,28 @@ input[type=text] {
 	padding: 0.5rem 1rem !important;
 	font-size: var(--font-size-6) !important;
 	
-    appearance: none;
-    background-clip: padding-box;
-    line-height: 1.5;
-    transition: border var(--timing-short) ease-in,background-color var(--timing-short) ease-in;
-    border-style: solid;
-    border-width: var(--border-width-input);
-    border-color: var(--color-border-input);
-    color: var(--color-text-input);
-    background-color: var(--color-background-input);
-    display: block;
-    width: 100%;
-    height: var(--input-size-default);
+	appearance: none;
+	background-clip: padding-box;
+	line-height: 1.5;
+	transition: border var(--timing-short) ease-in,background-color var(--timing-short) ease-in;
+	border-style: solid;
+	border-width: var(--border-width-input);
+	border-color: var(--color-border-input);
+	color: var(--color-text-input);
+	background-color: var(--color-background-input);
+	display: block;
+	width: 100%;
+	height: var(--input-size-default);
 }
 input[type=text]:hover {
-    outline: none;
-    border-color: var(--color-border-input-hover);
-    background-color: var(--color-background-input);
+	outline: none;
+	border-color: var(--color-border-input-hover);
+	background-color: var(--color-background-input);
 }
 input[type=text]:focus, input[type=text]:focus:hover {
-    outline: none;
-    border-color: var(--color-border-input-focus);
-    background-color: var(--color-background-input-focus);
+	outline: none;
+	border-color: var(--color-border-input-focus);
+	background-color: var(--color-background-input-focus);
 }
 
 
@@ -156,8 +156,8 @@ input[type=text]:focus, input[type=text]:focus:hover {
 	background: #755ebc;
 }
 .chat-line.message.highlight::before {
-    content: 'User redeemed a highlighted message:';
-    display: block;
+	content: 'User redeemed a highlighted message:';
+	display: block;
 }
 
 .chat-line.user-notice {
@@ -170,8 +170,8 @@ input[type=text]:focus, input[type=text]:focus:hover {
 }
 .chat-line .notice-announce {
 	fill: currentColor;
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 }
 .chat-line .notice-announce > div {
 	padding: 0.2rem;
@@ -352,16 +352,16 @@ input[type=text]:focus, input[type=text]:focus:hover {
 	z-index: 1;
 }
 #ctrl-fwd > span::after, #ctrl-back > span::after {
-    position: absolute;
-    border-bottom: solid 1px var(--color-background-base);
-    background-color: var(--color-background-base);
+	position: absolute;
+	border-bottom: solid 1px var(--color-background-base);
+	background-color: var(--color-background-base);
 	font-size: 0.8rem;
-    letter-spacing: -3px;
+	letter-spacing: -3px;
 }
 /* 
 #ctrl-fwd:hover > span::after, #ctrl-back:hover > span::after {
 	border-bottom: solid 1px var(--color-background-button-text-hover);
-    background-color: var(--color-background-button-text-hover);
+	background-color: var(--color-background-button-text-hover);
 } */
 #ctrl-fwd > span::after {
 	content: "\25B6\25B6";
@@ -545,6 +545,48 @@ input[type=text]:focus, input[type=text]:focus:hover {
 }
 .popupBalloon .prefs .notched-range--handle:hover {
 	box-shadow: 0 0 5px var(--color-background-range-fill);
+}
+
+
+.tooltip {
+	padding: 3px 6px;
+	border-radius: var(--border-radius-medium);
+	background-color: var(--color-background-tooltip);
+	color: var(--color-text-tooltip);
+	display: none;
+	position: absolute;
+	font-size: var(--font-size-6);
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--line-height-heading);
+	text-align: left;
+	z-index: var(--z-index-balloon);
+	pointer-events: none;
+	user-select: none;
+	white-space: nowrap;
+	margin-bottom: 6px;
+	top: 0; left: 50%;
+	transform: translateX(-50%);
+}
+.tooltip::before, .tooltip::after {
+	position: absolute;
+	content: "";
+}
+.tooltip::before {
+	top: -6px;
+	left: -6px;
+	width: calc(100% + 12px);
+	height: calc(100% + 12px);
+	z-index: var(--z-index-below);
+}
+.tooltip::after {
+	background-color: var(--color-background-tooltip);
+	left: 50%; bottom: -3px;
+	margin-left: -3px;
+	width: 6px; height: 6px;
+	transform: rotate(45deg);
+	z-index: var(--z-index-below);
+	border-radius: 0 0 var(--border-radius-small);
+
 }
 
 

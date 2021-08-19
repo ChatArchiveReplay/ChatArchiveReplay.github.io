@@ -101,6 +101,13 @@ const DEFAULT_ARCHIVE = {
 	}
 }
 
+function makeTimeStamp(t) {
+	let h = Math.floor(t / (60 * 60));
+	let m = Math.floor(t / 60) % 60;
+	let s = Math.floor(t) % 60;
+	return `${h}:${('00'+m).slice(-2)}:${('00'+s).slice(-2)}`;
+}
+
 /**
  * 
  * @param {string} username 
@@ -368,12 +375,8 @@ function _loadChatArchive(json, { seekTo=null }={}) {
 		
 	}
 	{ // Set total time
-		let t = json.video.end;
-		let h = Math.floor(t / (60 * 60));
-		let m = Math.floor(t / 60) % 60;
-		let s = Math.floor(t) % 60;
 		let $time = document.querySelector('#ctrl-timecode > span:nth-child(2)');
-		$time.innerText = `${h}:${('00'+m).slice(-2)}:${('00'+s).slice(-2)}`;
+		$time.innerText = makeTimeStamp(json.video.end);
 	}
 	document.getElementById('room-label').innerText = `${json.streamer.name} Chat Archive`;
 	document.querySelectorAll('.disable-on-finish').forEach((x)=>{x.disabled = false});
@@ -411,12 +414,8 @@ function togglePlayback(forceTo) {
 }
 
 function updateTimeDisplay() {
-	let h = Math.floor(currTime / (60 * 60));
-	let m = Math.floor(currTime / 60) % 60;
-	let s = Math.floor(currTime) % 60;
-	
 	let $time = document.querySelector('#ctrl-timecode > span');
-	$time.innerText = `${h}:${('00'+m).slice(-2)}:${('00'+s).slice(-2)}`;
+	$time.innerText = makeTimeStamp(currTime);
 	
 	let $progressBar = document.querySelector('.footer .timebar');
 	$progressBar.max = Math.floor(chatLog.video.end);
@@ -530,6 +529,36 @@ document.getElementById('load-load').addEventListener('click', ()=>{
 		console.error('Cannot load archive: URL is invalid.', err);
 	}
 });
+
+{
+	/** @type {HTMLProgressElement} */
+	let $bar = document.querySelector('.input-box .timebar');
+	let $lbl = document.querySelector('.input-box .seektime');
+	const getTimeFromOffset = (e)=>{
+		let x = e.clientX - $bar.getBoundingClientRect().left;
+		let p = (x / $bar.clientWidth);
+		//let t = p * (chatLog.video.end - chatLog.video.start); //??
+		let t = p * chatLog.video.end;
+		t = Math.min(Math.max(t, chatLog.video.start), chatLog.video.end);
+		return t;
+	};
+	$bar.addEventListener('mouseover', ()=>{
+		$lbl.style.display = 'block';
+	});
+	$bar.addEventListener('mouseout', ()=>{
+		$lbl.style.display = 'none';
+	});
+	$bar.addEventListener('mousemove', (e)=>{
+		let t = getTimeFromOffset(e);
+		$lbl.innerText = makeTimeStamp(t);
+		$lbl.style.left = `calc(${e.offsetX}px + var(--space-1))`;//(e.clientX - $bar.getBoundingClientRect().left);
+	});
+	$bar.addEventListener('click', (e)=>{
+		let t = getTimeFromOffset(e);
+		seekToTimecode(t);
+	});
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

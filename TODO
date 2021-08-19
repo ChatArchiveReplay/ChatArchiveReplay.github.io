@@ -2,7 +2,7 @@
 [x] Make a chat that looks like Twitch Chat
 [x] Play back from archive json
 [x] Make Load dialog box work
-[ ] Seek by clicking on progress bar
+[x] Seek by clicking on progress bar
 [x] Put streamer's name in top bar instead of "Empty Chat"
 [ ] Load from Twitch API the chat badges for non-chached badges
 [ ] Load from Twitch API emotes for non-stored emotes.
